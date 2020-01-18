@@ -36,6 +36,7 @@ extension Reader {
     @discardableResult
     mutating func read(until character: Character,
                        required: Bool = true,
+                       allowWhitespace: Bool = true,
                        allowLineBreaks: Bool = false) throws -> Substring {
         let startIndex = currentIndex
 
@@ -44,6 +45,10 @@ extension Reader {
                 let result = string[startIndex..<currentIndex]
                 advanceIndex()
                 return result
+            }
+
+            if !allowWhitespace, currentCharacter.isNewline {
+                break
             }
 
             if !allowLineBreaks, currentCharacter.isNewline {
@@ -69,16 +74,24 @@ extension Reader {
         return count
     }
 
+    /// Read characters that match by evaluating a keypath
+    ///
+    /// - Parameters:
+    ///   - keyPath: A keypath to evaluate that is `true` for target characters.
+    ///   - maxCount: The maximum number of characters to attempt to read.
+    /// - Returns: The substring of characters successfully read
+    /// - Complexity: O(*n*), where *n* is the length of the string being read.
     @discardableResult
-    mutating func readCharacters(matching keyPath: KeyPath<Character, Bool>) throws -> Substring {
+    mutating func readCharacters(matching keyPath: KeyPath<Character, Bool>,
+                                 max maxCount: Int = Int.max) throws -> Substring {
         let startIndex = currentIndex
-
-        while !didReachEnd {
-            guard currentCharacter[keyPath: keyPath] else {
-                break
-            }
-
+        var count = 0
+        
+        while !didReachEnd
+              && count < maxCount
+              && currentCharacter[keyPath: keyPath] {
             advanceIndex()
+            count += 1
         }
 
         guard startIndex != currentIndex else {
@@ -86,6 +99,21 @@ extension Reader {
         }
 
         return string[startIndex..<currentIndex]
+    }
+    
+    /// Read a character that exist in a set
+    ///
+    /// - Parameters:
+    ///   - set: The set of valid characters.
+    /// - Returns: The character that matched.
+    /// - Complexity: O(1)
+    @discardableResult
+    mutating func readCharacter(in set: Set<Character>) throws -> Character {
+        guard !didReachEnd else { throw Error() }
+        guard currentCharacter.isAny(of: set) else { throw Error() }
+        defer { advanceIndex() }
+
+        return currentCharacter
     }
 
     @discardableResult
@@ -108,7 +136,14 @@ extension Reader {
 
         return string[startIndex..<currentIndex]
     }
-
+    
+    mutating func discardWhitespaces() {
+        while !didReachEnd {
+            guard currentCharacter.isSameLineWhitespace else { return }
+            advanceIndex()
+        }
+    }
+    
     mutating func discardWhitespacesAndNewlines() {
         while !didReachEnd {
             guard currentCharacter.isWhitespace else { return }

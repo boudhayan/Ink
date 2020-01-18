@@ -111,7 +111,7 @@ For more information on how to use the Swift Package Manager, check out [this ar
 
 ## Command line tool
 
-Ink also ships with a simple but useful command line tool that enables you to use it to convert Markdown to HTML directly from the command line.
+Ink also ships with a simple but useful command line tool that lets you convert Markdown to HTML directly from the command line.
 
 To install it, clone the project and run `make`:
 
@@ -121,10 +121,30 @@ $ cd Ink
 $ make
 ```
 
-The command line tool will be installed as `ink`, and can be called with any Markdown string to convert it into HTML:
+The command line tool will be installed as `ink`, and can be passed Markdown text for conversion into HTML in several ways.
+
+Calling it without arguments will start reading from `stdin` until terminated with `Ctrl+D`:
 
 ```
-$ ink "$(cat README.md)"
+$ ink
+```
+
+Markdown text can be piped in when `ink` is called without arguments:
+
+```
+$ echo "*Hello World*" | ink
+```
+
+A single argument is treated as a filename, and the corresponding file will be parsed:
+
+```
+$ ink file.md
+```
+
+A Markdown string can be passed directly using the `-m` or `--markdown` flag:
+
+```
+$ ink -m "*Hello World*"
 ```
 
 You can of course also build your own command line tools that utilizes Ink in more advanced ways by importing it as a package.
@@ -138,15 +158,18 @@ Ink supports the following Markdown features:
 - Bold text, by surrounding a piece of text with either two asterisks (`**`), or two underscores (`__`). For example `**Bold text**`.
 - Text strikethrough, by surrounding a piece of text with two tildes (`~~`), for example `~~Strikethrough text~~`.
 - Inline code, marked with a backtick on either site of the code.
-- Code blocks, marked with three backticks both above and below the block.
+- Code blocks, marked with three or more backticks both above and below the block.
 - Links, using the following syntax: `[Title](url)`.
 - Images, using the following syntax: `![Alt text](image-url)`.
 - Both images and links can also use reference URLs, which can be defined anywhere in a Markdown document using this syntax: `[referenceName]: url`.
-- Both ordered lists (using numbers) and unordered lists (using either a dash (`-`), or an asterisk (`*`) as bullets) are supported.
+- Both ordered lists (using numbers followed by a period (`.`) or right parenthesis (`)`) as bullets) and unordered lists (using either a dash (`-`), plus (`+`), or asterisk (`*`) as bullets) are supported.
+- Ordered lists start from the index of the first entry
 - Nested lists are supported as well, by indenting any part of a list that should be nested within its parent.
 - Horizontal lines can be placed using either three asterisks (`***`) or three dashes (`---`) on a new line.
 - HTML can be inlined both at the root level, and within text paragraphs.
 - Blockquotes can be created by placing a greater-than arrow at the start of a line, like this: `> This is a blockquote`.
+
+Please note that, being a very young implementation, Ink does not fully support all Markdown specs, such as [CommonMark](https://commonmark.org). Ink definitely aims to cover as much ground as possible, and to include support for the most commonly used Markdown features, but if complete CommonMark compatibility is what you’re looking for — then you might want to check out tools like [CMark](https://github.com/commonmark/cmark).
 
 ## Internal architecture
 
@@ -169,6 +192,8 @@ The Markdown format was created by [John Gruber](https://twitter.com/gruber). Yo
 Ink is developed completely in the open, and your contributions are more than welcome.
 
 Before you start using Ink in any of your projects, it’s highly recommended that you spend a few minutes familiarizing yourself with its documentation and internal implementation, so that you’ll be ready to tackle any issues or edge cases that you might encounter.
+
+Since this is a very young project, it’s likely to have many limitations and missing features, which is something that can really only be discovered and addressed as more people start using it. While Ink is used in production to render all of [Swift by Sundell](https://swiftbysundell.com), it’s recommended that you first try it out for your specific use case, to make sure it supports the features that you need.
 
 This project does not come with GitHub Issues-based support, and users are instead encouraged to become active participants in its continued development — by fixing any bugs that they encounter, or by improving the documentation wherever it’s found to be lacking.
 

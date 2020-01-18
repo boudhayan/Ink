@@ -17,12 +17,12 @@ final class HorizontalLineTests: XCTestCase {
         World
         """)
 
-        XCTAssertEqual(html, "<p>Hello</p><hr/><p>World</p>")
+        XCTAssertEqual(html, "<p>Hello</p><hr><p>World</p>")
     }
 
     func testHorizontalLineWithDashesAtTheStartOfString() {
         let html = MarkdownParser().html(from: "---\nHello")
-        XCTAssertEqual(html, "<hr/><p>Hello</p>")
+        XCTAssertEqual(html, "<hr><p>Hello</p>")
     }
 
     func testHorizontalLineWithAsterisks() {
@@ -34,12 +34,12 @@ final class HorizontalLineTests: XCTestCase {
         World
         """)
 
-        XCTAssertEqual(html, "<p>Hello</p><hr/><p>World</p>")
+        XCTAssertEqual(html, "<p>Hello</p><hr><p>World</p>")
     }
 }
 
 extension HorizontalLineTests {
-    static var allTests: [(String, TestClosure<HorizontalLineTests>)] {
+    static var allTests: Linux.TestList<HorizontalLineTests> {
         return [
             ("testHorizonalLineWithDashes", testHorizonalLineWithDashes),
             ("testHorizontalLineWithDashesAtTheStartOfString", testHorizontalLineWithDashesAtTheStartOfString),

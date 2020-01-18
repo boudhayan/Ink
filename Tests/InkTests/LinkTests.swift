@@ -23,6 +23,18 @@ final class LinkTests: XCTestCase {
         XCTAssertEqual(html, #"<p><a href="swiftbysundell.com">Title</a></p>"#)
     }
 
+    func testCaseMismatchedLinkWithReference() {
+        let html = MarkdownParser().html(from: """
+        [Title][Foo]
+        [Title][αγω]
+
+        [FOO]: /url
+        [ΑΓΩ]: /φου
+        """)
+
+        XCTAssertEqual(html, #"<p><a href="/url">Title</a> <a href="/φου">Title</a></p>"#)
+    }
+
     func testNumericLinkWithReference() {
         let html = MarkdownParser().html(from: """
         [1][1]
@@ -47,17 +59,30 @@ final class LinkTests: XCTestCase {
         let html = MarkdownParser().html(from: "[He_llo](/he_llo)")
         XCTAssertEqual(html, "<p><a href=\"/he_llo\">He_llo</a></p>")
     }
+
+    func testUnterminatedLink() {
+        let html = MarkdownParser().html(from: "[Hello]")
+        XCTAssertEqual(html, "<p>[Hello]</p>")
+    }
+    
+    func testLinkWithEscapedSquareBrackets() {
+        let html = MarkdownParser().html(from: "[\\[Hello\\]](hello)")
+        XCTAssertEqual(html, #"<p><a href="hello">[Hello]</a></p>"#)
+    }
 }
 
 extension LinkTests {
-    static var allTests: [(String, TestClosure<LinkTests>)] {
+    static var allTests: Linux.TestList<LinkTests> {
         return [
             ("testLinkWithURL", testLinkWithURL),
             ("testLinkWithReference", testLinkWithReference),
+            ("testCaseMismatchedLinkWithReference", testCaseMismatchedLinkWithReference),
             ("testNumericLinkWithReference", testNumericLinkWithReference),
             ("testBoldLinkWithInternalMarkers", testBoldLinkWithInternalMarkers),
             ("testBoldLinkWithExternalMarkers", testBoldLinkWithExternalMarkers),
-            ("testLinkWithUnderscores", testLinkWithUnderscores)
+            ("testLinkWithUnderscores", testLinkWithUnderscores),
+            ("testUnterminatedLink", testUnterminatedLink),
+            ("testLinkWithEscapedSquareBrackets", testLinkWithEscapedSquareBrackets)
         ]
     }
 }

@@ -53,7 +53,13 @@ internal struct HTML: Fragment {
 
     func html(usingURLs urls: NamedURLCollection,
               modifiers: ModifierCollection) -> String {
-        return String(string)
+        String(string)
+    }
+
+    func plainText() -> String {
+        // Since we want to strip all HTML from plain text output,
+        // there is nothing to return here, just an empty string.
+        ""
     }
 }
 
@@ -74,7 +80,7 @@ private extension Reader {
                     return (name.dropLast(), true)
                 }
 
-                return (name, suffix.last == "/")
+                return (name, suffix.last == "/" || name == "!--")
             }
 
             advanceIndex()
